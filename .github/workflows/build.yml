@@ -2,11 +2,13 @@ name: Android CI
 
 on:
   workflow_dispatch:
-    
+  push:
+    branches:
+      - main
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     env:
       CCACHE_COMPILERCHECK: "%compiler% -dumpmachine; %compiler% -dumpversion"
       CCACHE_NOHASHDIR: "true"
@@ -39,7 +41,11 @@ jobs:
       # Install ccache
       - name: 安装 ccache
         run: sudo apt update && sudo apt upgrade -y && sudo apt install -y ccache python3 git curl
-
+      - name: install deps
+        run: |
+          sudo apt update
+          sudo apt install -y git build-essential bc bison flex libssl-dev libelf-dev libncurses5-dev python3 python3-distutils curl rsync unzip ccache lzop dwarves device-tree-compiler gcc-aarch64-linux-gnu gcc-arm-linux-gnueabi
+          
       - name: 配置 ccache
         run: |
           mkdir -p ~/.cache/bazel
@@ -63,6 +69,7 @@ jobs:
           path: |
             kernel-build-tools
             mkbootimg
+            linux-x86
           key: toolchain-${{ runner.os }}-v1
 
       # Step 2: Download toolchain if cache was not found
@@ -73,10 +80,33 @@ jobs:
           BRANCH=main-kernel-build-2024
           git clone $AOSP_MIRROR/kernel/prebuilts/build-tools -b $BRANCH --depth 1 kernel-build-tools
           git clone $AOSP_MIRROR/platform/system/tools/mkbootimg -b $BRANCH --depth 1 mkbootimg
-
+          git clone --depth=1 --filter=blob:none --sparse -b main https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86
+          cd linux-x86
+          git sparse-checkout set clang-r547379
       - name: 设置环境变量
         run: |
           echo "AVBTOOL=$GITHUB_WORKSPACE/kernel-build-tools/linux-x86/bin/avbtool" >> $GITHUB_ENV
           echo "MKBOOTIMG=$GITHUB_WORKSPACE/mkbootimg/mkbootimg.py" >> $GITHUB_ENV
           echo "UNPACK_BOOTIMG=$GITHUB_WORKSPACE/mkbootimg/unpack_bootimg.py" >> $GITHUB_ENV
+          echo "PATH=$GITHUB_WORKSPACE/linux-x86/clang-r547379/bin:$PATH" >> $GITHUB_ENV
+          echo "ARCH=arm64" >> $GITHUB_ENV
+          echo "SUBARCH=arm64" >> $GITHUB_ENV
+          echo "LLVM=1" >> $GITHUB_ENV
+          echo "LLVM_IAS=1" >> $GITHUB_ENV
+          echo "KBUILD_BUILD_USER=builder" >> $GITHUB_ENV
+          echo "CROSS_COMPILE=aarch64-linux-gnu-" >> $GITHUB_ENV
+          echo "CROSS_COMPILE_COMPAT=arm-linux-gnueabi-" >> $GITHUB_ENV
+          echo "CC=clang" >> $GITHUB_ENV
+          echo "KBUILD_BUILD_HOST=ubuntu" >> $GITHUB_ENV
+          echo "KBUILD_BUILD_USER=builder" >> $GITHUB_ENV
+          echo "CC=clang" >> $GITHUB_ENV
+      - name: clone code
+        run: |
+          git clone --depth 1 -b vic https://github.com/Evolution-X-Devices/kernel_xiaomi_sdm845.git
+      - name: build kernel
+        run: |
+          cd kernel_xiaomi_sdm845
+          make O=out vendor/xiaomi/mi845_defconfig
+          scripts/kconfig/merge_config.sh -m -O out out/.config arch/arm64/configs/vendor/xiaomi/polaris.config
+          make -j$(nproc) O=out LLVM=1 LLVM_IAS=1
       - uses: valeriangalliat/action-sshd-cloudflared@v4
