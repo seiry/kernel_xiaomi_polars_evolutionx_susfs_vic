@@ -103,7 +103,7 @@ jobs:
           echo "CC=clang" >> $GITHUB_ENV
           echo "CC=ccache clang" >> $GITHUB_ENV
           echo "CXX=ccache clang++" >> $GITHUB_ENV
-          echo "$KERNEL_ROOT=$GITHUB_WORKSPACE/kernel_xiaomi_sdm845" >> $GITHUB_ENV
+          echo "KERNEL_ROOT=$GITHUB_WORKSPACE/kernel_xiaomi_sdm845" >> $GITHUB_ENV
       - name: clone code
         run: |
           git clone --depth 1 -b vic https://github.com/Evolution-X-Devices/kernel_xiaomi_sdm845.git
