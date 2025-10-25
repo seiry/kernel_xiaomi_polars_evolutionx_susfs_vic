@@ -44,7 +44,7 @@ jobs:
       - name: install deps
         run: |
           sudo apt update
-          sudo apt install -y git build-essential bc bison flex libssl-dev libelf-dev libncurses5-dev python3 python3-distutils curl rsync unzip ccache lzop dwarves device-tree-compiler gcc-aarch64-linux-gnu gcc-arm-linux-gnueabi
+          sudo apt install -y git build-essential bc bison flex libssl-dev libelf-dev libncurses5-dev python3 python3-distutils curl rsync unzip ccache lzop dwarves device-tree-compiler gcc-aarch64-linux-gnu gcc-arm-linux-gnueabi gcc-arm-linux-gnueabihf
           
       - name: 配置 ccache
         run: |
@@ -95,11 +95,14 @@ jobs:
           echo "LLVM_IAS=1" >> $GITHUB_ENV
           echo "KBUILD_BUILD_USER=builder" >> $GITHUB_ENV
           echo "CROSS_COMPILE=aarch64-linux-gnu-" >> $GITHUB_ENV
+          echo "CROSS_COMPILE_ARM32=arm-linux-gnueabihf-" >> $GITHUB_ENV
           echo "CROSS_COMPILE_COMPAT=arm-linux-gnueabi-" >> $GITHUB_ENV
           echo "CC=clang" >> $GITHUB_ENV
           echo "KBUILD_BUILD_HOST=ubuntu" >> $GITHUB_ENV
           echo "KBUILD_BUILD_USER=builder" >> $GITHUB_ENV
           echo "CC=clang" >> $GITHUB_ENV
+          echo "CC=ccache clang" >> $GITHUB_ENV
+          echo "CXX=ccache clang++" >> $GITHUB_ENV
       - name: clone code
         run: |
           git clone --depth 1 -b vic https://github.com/Evolution-X-Devices/kernel_xiaomi_sdm845.git
@@ -109,7 +112,7 @@ jobs:
           cd kernel_xiaomi_sdm845
           curl -LSs "https://raw.githubusercontent.com/SukiSU-Ultra/SukiSU-Ultra/main/kernel/setup.sh" | bash -s nongki
 
-      - uses: valeriangalliat/action-sshd-cloudflared@v4
+      # - uses: valeriangalliat/action-sshd-cloudflared@v4
       - name: build kernel
         run: |
           cd kernel_xiaomi_sdm845
