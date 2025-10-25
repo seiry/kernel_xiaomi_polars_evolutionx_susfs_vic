@@ -103,10 +103,16 @@ jobs:
       - name: clone code
         run: |
           git clone --depth 1 -b vic https://github.com/Evolution-X-Devices/kernel_xiaomi_sdm845.git
+
+      - name: patch SukiSU
+        run: |
+          cd kernel_xiaomi_sdm845
+          curl -LSs "https://raw.githubusercontent.com/SukiSU-Ultra/SukiSU-Ultra/main/kernel/setup.sh" | bash -s nongki
+
+      # - uses: valeriangalliat/action-sshd-cloudflared@v4
       - name: build kernel
         run: |
           cd kernel_xiaomi_sdm845
           make O=out vendor/xiaomi/mi845_defconfig
           scripts/kconfig/merge_config.sh -m -O out out/.config arch/arm64/configs/vendor/xiaomi/polaris.config
           make -j$(nproc) O=out LLVM=1 LLVM_IAS=1
-      - uses: valeriangalliat/action-sshd-cloudflared@v4
