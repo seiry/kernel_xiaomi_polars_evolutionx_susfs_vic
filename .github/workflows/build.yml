@@ -121,7 +121,7 @@ jobs:
           cp ../SukiSU_patch/4.9/*.patch .
           for patch in *.patch; do
             echo "Applying $patch"
-            patch -p1 < "$patch"
+            patch -p1 < "$patch" || echo "WARN: failed to apply $patch, continue"
           done
       # - name: patch susfs
       #   run: |
