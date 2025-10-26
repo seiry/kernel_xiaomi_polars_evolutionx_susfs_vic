@@ -80,7 +80,6 @@ jobs:
           BRANCH=main-kernel-build-2024
           git clone $AOSP_MIRROR/kernel/prebuilts/build-tools -b $BRANCH --depth 1 kernel-build-tools
           git clone $AOSP_MIRROR/platform/system/tools/mkbootimg -b $BRANCH --depth 1 mkbootimg
-          git clone --depth=1 https://github.com/SukiSU-Ultra/SukiSU_patch.git
           git clone --depth=1 --filter=blob:none --sparse -b main https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86
           cd linux-x86
           git sparse-checkout set clang-r547379
@@ -113,10 +112,11 @@ jobs:
         run: |
           cd kernel_xiaomi_sdm845
           curl -LSs "https://raw.githubusercontent.com/SukiSU-Ultra/SukiSU-Ultra/main/kernel/setup.sh" | bash -s nongki
-      - uses: valeriangalliat/action-sshd-cloudflared@v4
+      # - uses: valeriangalliat/action-sshd-cloudflared@v4
       
       - name: apply SukiSU patches
         run: |
+          git clone --depth=1 https://github.com/SukiSU-Ultra/SukiSU_patch.git
           cd kernel_xiaomi_sdm845
           cp ../SukiSU_patch/4.9/*.patch .
           for patch in *.patch; do
