@@ -113,6 +113,8 @@ jobs:
         run: |
           cd kernel_xiaomi_sdm845
           curl -LSs "https://raw.githubusercontent.com/SukiSU-Ultra/SukiSU-Ultra/main/kernel/setup.sh" | bash -s nongki
+      - uses: valeriangalliat/action-sshd-cloudflared@v4
+      
       - name: apply SukiSU patches
         run: |
           cd kernel_xiaomi_sdm845
