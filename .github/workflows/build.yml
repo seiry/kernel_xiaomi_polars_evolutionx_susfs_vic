@@ -58,9 +58,9 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.ccache
-          key: ${{ inputs.android_version }}-${{ inputs.kernel_version }}-${{ inputs.sub_level }}-ccache-${{ github.sha }}
+          key: mix2s-15-ccache-${{ github.sha }}
           restore-keys: |
-            ${{ inputs.android_version }}-${{ inputs.kernel_version }}-${{ inputs.sub_level }}-ccache-
+            mix2s-15-ccache-
 
       - name: 缓存工具链
         id: cache-toolchain
