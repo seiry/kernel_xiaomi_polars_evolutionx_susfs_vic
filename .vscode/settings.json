@@ -15,6 +15,7 @@
         "kconfig",
         "libelf",
         "MKBOOTIMG",
+        "nongki",
         "olddefconfig",
         "prebuilts",
         "ramdisk",
