@@ -1,0 +1,28 @@
+{
+    "cSpell.words": [
+        "androidboot",
+        "AOSP",
+        "ccache",
+        "cloudflared",
+        "cmdline",
+        "configfs",
+        "defconfig",
+        "distutils",
+        "earlycon",
+        "geni",
+        "gnueabi",
+        "gnueabihf",
+        "kconfig",
+        "libelf",
+        "MKBOOTIMG",
+        "olddefconfig",
+        "prebuilts",
+        "ramdisk",
+        "Suki",
+        "susfs",
+        "swapfile",
+        "swiotlb",
+        "ufshc",
+        "usbcontroller"
+    ]
+}
