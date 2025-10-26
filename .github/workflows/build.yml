@@ -132,11 +132,19 @@ jobs:
           scripts/kconfig/merge_config.sh -m -O out out/.config arch/arm64/configs/vendor/xiaomi/polaris.config
           make O=out olddefconfig
           make -j$(nproc) O=out LLVM=1 LLVM_IAS=1
+      - name: build boot.img
+        run: |
+          cd kernel_xiaomi_sdm845/out
+          KERNEL_IMG=$(find $GITHUB_WORKSPACE/kernel_xiaomi_sdm845/out/arch/arm64/boot/ -type f -name "Image.gz-dtb" | head -n 1)
+          RAMDISK_IMG=$(find $GITHUB_WORKSPACE/files -type f -name "ramdisk" | head -n 1)
+          $MKBOOTIMG --kernel $KERNEL_IMG --ramdisk $RAMDISK_IMG --cmdline "console=ttyMSM0,115200n8 earlycon=msm_geni_serial,0xA84000 androidboot.hardware=qcom androidboot.console=ttyMSM0 msm_rtb.filter=0x237 ehci-hcd.park=3 lpm_levels.sleep_disabled=1 service_locator.enable=1 swiotlb=2048 androidboot.configfs=true loop.max_part=7 androidboot.usbcontroller=a600000.dwc3 androidboot.boot_devices=soc/1d84000.ufshc cgroup_disable=pressure androidboot.super_partition=system" --os_version 15.0.0 --os_patch_level 2025-09 --header_version 1 --pagesize 4096 --base 0x00000000 --kernel_offset 0x00008000 --ramdisk_offset 0x01000000 --tags_offset 0x00000100 -o boot_SukiSU.img
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: SukiSU-kernel
-          path: ${{ github.workspace }}/kernel_xiaomi_sdm845/out/arch/arm64/boot/
+          path: |
+            ${{ github.workspace }}/kernel_xiaomi_sdm845/out/arch/arm64/boot/
+            ${{ github.workspace }}/kernel_xiaomi_sdm845/out/boot_SukiSU.img
           retention-days: 14
           compression-level: 6
           if-no-files-found: error
